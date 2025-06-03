@@ -1,41 +1,33 @@
 # Employee Attrition Prediction
 
 ## Project Overview
-Proyek ini bertujuan untuk memprediksi kemungkinan karyawan mengundurkan diri (attrition) dan memahami faktor-faktor utama yang mempengaruhinya. Tingginya angka pengunduran diri dapat menimbulkan kerugian finansial dan hilangnya talenta penting dalam perusahaan.
+Proyek ini bertujuan untuk menganalisis faktor-faktor yang memengaruhi keputusan karyawan untuk mengundurkan diri (attrition) serta membangun model prediktif berbasis machine learning. Tingginya angka pengunduran diri dapat menyebabkan kerugian finansial dan hilangnya talenta penting, sehingga analisis ini diharapkan dapat membantu tim HR dalam merancang kebijakan retensi yang lebih tepat dan strategis.
 
-Proyek ini bertujuan untuk menganalisis faktor-faktor yang memengaruhi keputusan karyawan untuk mengundurkan diri (attrition) dan membangun model prediktif berbasis machine learning. Analisis ini diharapkan dapat membantu tim HR dalam mengambil kebijakan retensi yang lebih tepat.
 ## Latar Belakang
 
 Turnover karyawan merupakan tantangan besar bagi perusahaan. Biaya yang ditimbulkan mencakup pelatihan, perekrutan ulang, hingga penurunan produktivitas. Oleh karena itu, diperlukan analisis untuk memahami faktor-faktor pemicu agar strategi pencegahan dapat dilakukan.
 
 ## Business Understanding  
 
-Perusahaan ingin menurunkan angka pengunduran diri dengan memahami siapa saja karyawan yang berpotensi resign dan faktor-faktor apa yang mempengaruhinya. Hal ini penting untuk menyusun kebijakan SDM seperti promosi, kompensasi, dan perbaikan lingkungan kerja.
-
-Attrition karyawan yang tinggi merupakan salah satu tantangan besar dalam manajemen SDM. Perusahaan perlu memahami karakteristik karyawan yang berisiko tinggi mengundurkan diri agar dapat mengambil tindakan preventif seperti meningkatkan kepuasan kerja atau memberikan promosi tepat waktu.
+Perusahaan ingin menurunkan angka pengunduran diri dengan memahami siapa saja karyawan yang berpotensi resign serta faktor-faktor yang mempengaruhinya. Tingginya tingkat attrition menjadi tantangan besar dalam manajemen SDM, sehingga penting bagi perusahaan untuk mengenali karakteristik karyawan berisiko tinggi agar dapat mengambil tindakan preventif, seperti meningkatkan kepuasan kerja, memberikan promosi tepat waktu, serta menyusun kebijakan kompensasi dan perbaikan lingkungan kerja yang efektif.
 
 ### Problem Statements  
-Perusahaan tidak mengetahui secara pasti siapa saja karyawan yang berpotensi mengundurkan diri dan faktor apa yang mendorong mereka keluar. Kurangnya informasi ini menyulitkan perencanaan strategi retensi yang efektif.
+Perusahaan belum memiliki pemahaman yang jelas mengenai karyawan yang berpotensi mengundurkan diri serta faktor-faktor yang mempengaruhi keputusan tersebut. Keterbatasan informasi ini menghambat perencanaan strategi retensi yang efektif dan tepat sasaran.
 
 ### Goals  
-Memprediksi kemungkinan seorang karyawan akan resign menggunakan machine learning.
-
-Mengidentifikasi fitur-fitur utama yang berkontribusi terhadap attrition.
-
-Memberikan insight actionable bagi tim HR untuk meningkatkan retensi. 
+- Memprediksi kemungkinan seorang karyawan mengundurkan diri menggunakan teknik machine learning.  
+- Mengidentifikasi fitur-fitur utama yang berkontribusi signifikan terhadap attrition.  
+- Memberikan insight actionable yang dapat digunakan oleh tim HR untuk meningkatkan retensi karyawan.
 
 ### Solution Statements  
+- Melakukan Exploratory Data Analysis (EDA) guna menggali pola dan insight dari data historis.  
+- Melakukan pembersihan data serta feature engineering untuk mempersiapkan dataset yang optimal bagi pemodelan.  
+- Melatih dan membandingkan performa model prediktif menggunakan Logistic Regression dan Random Forest.  
+- Mengevaluasi hasil model dan menginterpretasi fitur-fitur penting yang mempengaruhi keputusan resign.
 
-Melakukan EDA untuk menemukan insight dari data historis.
-
-Membersihkan dan mempersiapkan data (preprocessing & feature engineering).
-
-Melatih model prediktif (Logistic Regression dan Random Forest).
-
-Mengevaluasi performa model dan menginterpretasi fitur penting.
 
 ## Data Understanding
-# Data Understanding
+
 
 Dataset yang digunakan dalam proyek ini merupakan data karyawan dari sebuah perusahaan fiktif yang dibuat oleh tim data scientist IBM dan tersedia secara publik di [Kaggle](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset)
 . Dataset ini mencakup informasi demografis, status pekerjaan, riwayat kerja, kepuasan kerja, serta status pengunduran diri (attrition) dari 1.470 karyawan.
@@ -160,56 +152,132 @@ Atribut-atribut yang tersedia dijelaskan pada Tabel 1 berikut.
     ![Attrition Berdasarkan Lama Tidak Dipromosikan](image/10.png)
   Gambar 11. Attrition Berdasarkan Lama Tidak Dipromosikan
 
-## Data Preparation
+## Data Preprocessing
 
-![Film Terpopuler](image/pp.png)
+1. Penghapusan Fitur
+    - Penghapusan Fitur Non-Informasi (Konstan)
+    
+      Beberapa fitur memiliki nilai yang sama pada seluruh entri sehingga tidak memberikan kontribusi informasi apapun dalam proses pembelajaran model. Fitur-fitur tersebut dihapus karena bersifat redundan:
+      - `EmployeeCount`
+      - `Over18`
+      - `StandardHours`
+
+    - Penghapusan Fitur dengan Korelasi Tinggi (>90%)
+      
+      Fitur `MonthlyIncome` memiliki korelasi sangat tinggi dengan variabel JobLevel. Untuk menghindari multikolinearitas yang dapat memengaruhi interpretabilitas dan akurasi model, fitur ini dihapus
+
+    - Penghapusan Fitur Identifier
+
+      Fitur `EmployeeNumber` hanya berfungsi sebagai pengenal unik tiap entri, tanpa memiliki nilai prediktif terhadap fenomena yang dianalisis. Oleh karena itu, fitur ini juga dihilangkan.
+
+2. Feature Engineering
+
+    Dalam upaya meningkatkan daya prediktif dataset, dilakukan rekayasa fitur dengan menambahkan beberapa variabel turunan yang mencerminkan dinamika pengalaman dan hubungan kerja karyawan. Fitur-fitur baru yang ditambahkan adalah sebagai berikut:
+    - `YearsInSameRoleRatio` - Mengukur proporsi waktu seorang karyawan berada dalam peran yang sama dibandingkan dengan total pengalaman kerjanya. Rasio ini dapat mencerminkan stabilitas atau stagnasi dalam karier.
+    - `YearsWithManagerRatio` - Menggambarkan durasi hubungan kerja dengan atasan saat ini relatif terhadap masa kerja di perusahaan. Semakin tinggi nilai ini, semakin lama karyawan bekerja dengan manajer yang sama.
+    - `PromotionGap` - Mengindikasikan jarak waktu antara lama bekerja di perusahaan dengan waktu sejak promosi terakhir. Nilai yang besar bisa menjadi sinyal karyawan belum mengalami perkembangan karier, yang dapat memengaruhi keputusan untuk resign.
 
 ## Modeling & Result
 
-Berikut adalah hasil evaluasi model yang digunakan untuk prediksi customer churn:
+Untuk memprediksi kemungkinan karyawan mengundurkan diri (attrition), dua model machine learning digunakan:
 
-| **Model**                   | **Akurasi**        | **Recall**        | **AUC Train**       | **AUC Test**       |
-|-----------------------------|:-----------------:|:-----------------:|:------------------:|:-----------------:|
-| **Logistic Regression**     | 🟡 88%            | 🔴 60%            | 🟠 82%             | 🟠 84%            |
-| **Random Forest**           | **🟢 95%**        | **🟢 89%**        | **🟢 94%**         | **🟢 92%**        |
-| **K-Nearest Neighbors**     | 🟡 90%            | 🟠 68%            | **🟢 96%**         | 🔴 83%            |
-| **XGBOOST**                 | 🔴 79%            | 🟡 81%            | 🟡 89%             | 🟡 86%            |
-| **SVC**                     | 🟠 84%            | 🟠 85%            | 🟠 91%             | 🟠 91%            |
+- Logistic Regression: Model linear yang mudah diinterpretasikan.
+- Random Forest: Model ensemble non-linear yang menangkap hubungan kompleks antar fitur.
+
+1. Logistik Regression
+
+    Model ini memberikan hasil baik dalam mendeteksi karyawan yang tidak resign, namun masih kurang optimal dalam mengenali yang akan resign. Model ini memiliki ROC-AUC sebesar 0.82, menunjukkan kinerja klasifikasi yang baik secara keseluruhan.
+
+    | Metode           | Precision | Recall | F1-Score | Support |
+    | ---------------- | --------- | ------ | -------- | ------- |
+    | Tidak Resign (0) | 0.89      | 0.97   | 0.93     | 370     |
+    | Resign (1)       | 0.69      | 0.38   | 0.49     | 71      |
+    |    **Akurasi**      |           |        | **0.87** | 441     |
+    | **ROC-AUC**      |           |        | **0.82** |         |
+
+    10 Fitur penting Logistic Regression:
+
+    | Rank | Fitur                              | Koefisien |
+    |    ---- | ---------------------------------- | --------- |
+    | 1    | OverTime                           | +0.89     |
+    | 2    | TotalWorkingYears                  | –0.70     |
+    | 3    | JobRole\_Sales Executive           | +0.68     |
+    | 4    | JobRole\_Laboratory Technician     | +0.66     |
+    | 5    | BusinessTravel\_Travel\_Frequently | +0.66     |
+    | 6    | JobRole\_Sales Representative      | +0.59     |
+    | 7    | YearsWithManagerRatio              | –0.56     |
+    | 8    | YearsWithCurrManager               | +0.50     |
+    | 9    | NumCompaniesWorked                 | +0.50     |
+    | 10   | EnvironmentSatisfaction            | –0.46     |
+
+   Faktor seperti lembur (OverTime), frekuensi perjalanan dinas, dan jenis peran kerja sangat berpengaruh terhadap keputusan resign.
+
+2. Random Forest
+   
+    Model ini lebih kompleks dan mampu menangkap pola yang tidak linear, namun kinerjanya kurang baik dalam mendeteksi karyawan yang resign (recall hanya 15%). Walau akurasi keseluruhan cukup tinggi, model ini cenderung bias terhadap kelas mayoritas (tidak resign)
+
+    | Metode           | Precision | Recall | F1-Score | Support |
+    | ---------------- | --------- | ------ | -------- | ------- |
+    | Tidak Resign (0) | 0.86      | 0.97   | 0.91     | 370     |
+    | Resign (1)       | 0.52      | 0.15   | 0.24     | 71      |
+    | **Akurasi**      |           |        | **0.84** | 441     |
+    | **ROC-AUC**      |           |        | **0.77** |         |
 
 
-Recall berfokus pada kemampuan model dalam mengidentifikasi pelanggan yang benar-benar churn (**True Positive, TP**) dari keseluruhan pelanggan yang seharusnya terdeteksi sebagai churn (**TP + False Negative, FN**). Model dengan **recall tinggi** mampu mengenali sebagian besar pelanggan yang berpotensi berhenti berlangganan, memungkinkan perusahaan untuk **mengambil tindakan pencegahan secara proaktif**, seperti menawarkan promosi khusus, meningkatkan layanan, atau memberikan penawaran yang lebih menarik guna mempertahankan pelanggan.
 
-Selain itu, model dengan **nilai FN yang rendah** menunjukkan **ketepatan tinggi dalam menghindari kesalahan pengelompokan pelanggan non-churn sebagai churn**. Dengan demikian, perusahaan tidak akan membuang sumber daya pada pelanggan yang sebenarnya tidak berniat untuk berhenti berlangganan. Kesalahan prediksi yang lebih banyak pada **False Positive (FP)**—di mana pelanggan yang sebenarnya tetap berlangganan diprediksi churn—dapat lebih ditoleransi dibandingkan kesalahan pada FN, karena tindakan mitigasi tetap dapat memberikan manfaat dalam meningkatkan loyalitas pelanggan.  
+Perbandingan Model:
 
-![Film Terpopuler](image/cm.png)
+| Aspek                  | Logistic Regression | Random Forest     |
+| ---------------------- | ------------------- | ----------------- |
+| **Akurasi**            | 87%                 | 84%               |
+| **ROC-AUC**            | **0.82**          | 0.77              |
+| **Recall (Resign)**    | **38%**           | 15%               |
+| **Precision (Resign)** | **69%**           | 52%               |
+| **Interpretabilitas**  | Tinggi            | Rendah            |
+| **Insight dari Fitur** | Jelas             | Kurang transparan |
 
-Secara keseluruhan, model dengan **recall tinggi** menjadi **pilihan terbaik** dalam analisis customer churn, terutama ketika tujuan utama perusahaan adalah **meminimalkan kehilangan pelanggan dan meningkatkan strategi retensi**.
 
----
-Berdasarkan hasil evaluasi model, algoritma **Random Forest Classification** memiliki performa terbaik dengan **akurasi 95%**, **recall 89%**, serta **AUC Train 94%** dan **AUC Test 92%**. Dengan performa yang unggul dalam mengidentifikasi pelanggan yang benar-benar churn, model ini dipilih sebagai model utama untuk pengujian data.  
+## Conclusion
 
-Berdasarkan hasil pengujian pada **data test**, model **Random Forest Classification** memprediksi bahwa sebanyak **539 pelanggan akan melakukan churn**, sedangkan **211 pelanggan diprediksi tetap berlangganan**. Jumlah pelanggan yang diperkirakan churn ini menunjukkan **persentase yang signifikan** dalam keseluruhan dataset, yang mengindikasikan pentingnya strategi mitigasi untuk mempertahankan pelanggan.  
+Proyek ini berhasil membangun sistem prediktif untuk mengidentifikasi karyawan yang berpotensi mengundurkan diri berdasarkan data HR.
 
-Dengan informasi ini, perusahaan dapat **menggunakan pendekatan yang lebih personal** untuk mengurangi angka churn, seperti menawarkan **promosi eksklusif**, **meningkatkan kualitas layanan**, atau **mengidentifikasi faktor utama yang menyebabkan ketidakpuasan pelanggan**. Evaluasi lebih lanjut juga diperlukan untuk memastikan **akurasi prediksi** dan **mengurangi kemungkinan kesalahan klasifikasi**, sehingga strategi yang diterapkan dapat lebih efektif dan tepat sasaran.
+- Temuan Utama:
+    - **Faktor paling berpengaruh terhadap attrition** adalah `OverTime`, `TotalWorkingYears`, `YearsWithManagerRatio`, serta beberapa peran pekerjaan tertentu seperti `Sales Executive` dan `Laboratory Technician`.
+    - **Karyawan dengan jam lembur tinggi, pengalaman kerja pendek, dan interaksi rendah dengan manajer** cenderung lebih berisiko untuk resign.
+    - **EDA** menunjukkan bahwa usia muda, status pernikahan, jarak rumah, dan keterlambatan promosi juga berkorelasi dengan keputusan resign.
 
-## Strategi Retensi Pelanggan  
+- Performa Model:
+    - **Logistic Regression** memberikan keseimbangan terbaik antara akurasi dan interpretabilitas, dengan ROC-AUC 0.82 dan f1-score cukup baik pada kelas minoritas.
+    - **Random Forest** memiliki akurasi keseluruhan yang tinggi, namun kurang efektif dalam mengklasifikasikan karyawan yang resign (recall rendah).
 
-### 1. Segmentasi Pelanggan Berdasarkan Lokasi dan Tingkat Churn  
-- **Prioritaskan strategi retensi pelanggan** di lima negara bagian dengan tingkat churn minimal **5%**, yaitu **WV, MN, ID, AL, dan VA**.  
-- **Lakukan analisis mendalam** untuk memahami penyebab churn di wilayah tersebut dan menyesuaikan strategi retensi secara lokal.  
-- **Bangun program loyalitas** atau penawaran khusus untuk pelanggan di area-area tersebut guna meningkatkan retensi.  
+- Recommendation:
 
-### 2. Optimalisasi Penawaran dan Layanan Berdasarkan Kebiasaan Penggunaan  
-- **Evaluasi kembali biaya roaming dan kualitas jaringan** bagi pelanggan dengan **International Plan** dan lakukan perbaikan yang diperlukan.  
-- **Tawarkan paket roaming internasional** yang lebih terjangkau atau tingkatkan kualitas jaringan di wilayah-wilayah tertentu.  
-- **Berikan insentif atau paket khusus** bagi pelanggan yang sering melakukan panggilan internasional, karena mereka cenderung berbicara lebih lama.  
+  1. Optimalkan Manajemen Lembur 
 
-### 3. Peningkatan Kualitas Layanan dan Pengalaman Pelanggan  
-- **Promosikan penggunaan voice mail plan** dengan insentif khusus, meningkatkan kesadaran pelanggan akan manfaatnya.  
-- **Identifikasi dan perbaiki masalah utama** yang sering dilaporkan oleh pelanggan yang menghubungi **customer service lebih dari 4 kali**, guna meningkatkan kepuasan pelanggan.  
+      - Jam kerja lembur (OverTime) adalah prediktor kuat terhadap attrition.
+      - Rekomendasi:
+        - Lakukan audit lembur secara berkala.
+        - Implementasikan sistem rotasi atau workload balancing.
+        - Berikan kompensasi atau benefit tambahan untuk karyawan dengan beban lembur tinggi.
 
-### 4. Penyesuaian Strategi Harga Berdasarkan Kebutuhan Pelanggan  
-- **Tinjau kembali struktur harga panggilan pagi hari**, terutama untuk panggilan dengan durasi panjang, guna mengurangi churn.  
-- **Perkenalkan paket atau diskon khusus** untuk panggilan pagi hari agar lebih sesuai dengan kebutuhan pelanggan dan memberikan nilai tambah yang jelas.  
-- **Sediakan opsi harga yang kompetitif** untuk panggilan internasional, sambil tetap mempertahankan profitabilitas perusahaan.  
+  2. Tingkatkan Hubungan antara Karyawan & Manajer
 
+      - Semakin lama seorang karyawan bekerja dengan manajer yang sama, semakin kecil kemungkinan mereka resign.
+      - Rekomendasi:
+        - Latih manajer agar mampu menjadi pemimpin yang suportif dan komunikatif.
+        - Evaluasi performa manajerial secara berkala dari sisi engagement, bukan hanya output.
+
+  3. Perhatikan Perjalanan Karier dan Promosi
+      - Gap promosi yang terlalu lama bisa menjadi penyebab utama attrition.
+      - Rekomendasi:
+        - Tetapkan jalur karier yang jelas dan transparan.
+        - Sediakan kesempatan pengembangan (training, mentorship, proyek khusus) untuk karyawan stagnan.
+        - Evaluasi ulang sistem promosi berbasis objektif dan data.
+
+  4. Retensi Karyawan Muda dan Level Rendah
+      - Karyawan muda dan dengan job level rendah memiliki tingkat pengunduran diri yang lebih tinggi.
+      - Rekomendasi:
+        - Tawarkan program onboarding yang lebih intensif dan berkelanjutan.
+        - Bangun sistem dukungan awal karier (peer mentor, coaching).
+        - Berikan kejelasan mengenai prospek karier sejak awal.
+  
